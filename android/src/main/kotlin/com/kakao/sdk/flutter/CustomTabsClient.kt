@@ -12,6 +12,7 @@ import androidx.browser.customtabs.CustomTabsIntent
 import androidx.browser.customtabs.CustomTabsService
 import androidx.browser.customtabs.CustomTabsServiceConnection
 
+
 /**
  * @author kevin.kang. Created on 2019-06-12..
  */
@@ -24,7 +25,7 @@ object CustomTabsCommonClient {
     val connection = object : CustomTabsServiceConnection() {
       override fun onCustomTabsServiceConnected(name: ComponentName, client: CustomTabsClient) {
         val builder = CustomTabsIntent.Builder()
-            .enableUrlBarHiding().setShowTitle(true)
+            .setUrlBarHidingEnabled(true).setShowTitle(true)
         val customTabsIntent = builder.build()
         customTabsIntent.intent.data = uri
         customTabsIntent.intent.setPackage(packageName)
@@ -40,7 +41,7 @@ object CustomTabsCommonClient {
   }
 
   fun open(context: Context, uri: Uri) {
-    CustomTabsIntent.Builder().enableUrlBarHiding().setShowTitle(true).build()
+    CustomTabsIntent.Builder().setUrlBarHidingEnabled(true).setShowTitle(true).build()
         .launchUrl(context, uri)
   }
 
