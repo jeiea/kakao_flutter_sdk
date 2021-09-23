@@ -29,7 +29,7 @@ Specify Kakao SDK dependency as below in your `pubspec.yaml`.
 
 ```yaml
 dependencies:
-  kakao_flutter_sdk: ^0.7.0
+  kakao_flutter_sdk: ^0.8.1
 ```
 
 ### dependencies
@@ -40,7 +40,7 @@ Kakao Flutter SDK has following dependencies:
 1. [json_annotation](https://pub.dev/packages/json_serializable) (4.0.1)
 1. [shared_preferences](https://pub.dev/packages/shared_preferences) (2.0.5)
 1. platform (3.0.0)
-1. package_info (2.0.0)
+1. package_info_plus (1.0.4)
 
 Below dependencies were considered but were removed due to restrictions against our needs:
 
@@ -62,10 +62,8 @@ Follow the instructions below:
 
 Below are additional steps you have to take for Android and iOS platform.
 
-1. [키 해시(Key Hash) 등록](https://developers.kakao.com/docs/latest/ko/getting-started/sdk-android-v1#key-hash) to use Kakao API.
-1. [plist 설정](https://developers.kakao.com/docs/latest/ko/getting-started/sdk-ios-v1#plist)
-1. [URL Scheme 설정](https://developers.kakao.com/docs/latest/ko/getting-started/sdk-ios-v1#url-scheme)
-1. [화이트리스트 설정](https://developers.kakao.com/docs/latest/ko/getting-started/sdk-ios-v1#white-list)
+1. [키 해시(Key Hash) 등록](https://developers.kakao.com/docs/latest/ko/getting-started/sdk-android#add-key-hash) to use Kakao API.
+1. [plist 설정 & URL Scheme 설정](https://developers.kakao.com/docs/latest/ko/getting-started/sdk-ios#set-plist)
 
 Also, minimum iOS version for Kakao Flutter SDK is 11.
 Therefore, you have to specify 11 is your iOS application's `Podfile` like below:
@@ -269,7 +267,7 @@ import 'package:kakao_flutter_sdk/user.dart'; // must be imported if version is 
       final authCode = installed ? await AuthCodeClient.instance.requestWithTalk() : await AuthCodeClient.instance.request();
     } on KakaoAuthException catch (e) {
 
-    } on kakaoClientException catch(e) {
+    } on KakaoClientException catch(e) {
 
     }
   }
@@ -278,6 +276,13 @@ import 'package:kakao_flutter_sdk/user.dart'; // must be imported if version is 
 
 
 #### Getting Access Token
+
+> In version 0.8.0, `AccessTokenStore` was incorrectly renamed to `TokenManageable`.
+>
+> So, It has been renamed to **`TokenManager`** since version 0.8.1.
+>
+> Also,  Method `fromStore()` has been renamed to `getToken()` and `toStore()` has been rename to `setToken()`.
+ 
 
 Then, you have to issue access token for the user with authorization code acuiqred from the process above.
 Sample login code is pasted below:
@@ -288,7 +293,7 @@ void loginButtonClicked() async {
     String authCode = await AuthCodeClient.instance.request(); // via browser
     // String authCode = await AuthCodeClient.instance.requestWithTalk() // or with KakaoTalk
     AccessTokenResponse token = await AuthApi.instance.issueAccessToken(authCode);
-    AccessTokenStore.instance.toStore(token); // Store access token in AccessTokenStore for future API requests.
+    TokenManager.instance.setToken(token); // Store access token in TokenManager for future API requests.
   } catch (e) {
     // some error happened during the course of user login... deal with it.
   }
@@ -300,11 +305,11 @@ void loginButtonClicked() async {
 
 > Kakao Flutter SDK supports Kakao Login via KakaoTalk on Android and iOS now.
 
-After user's first login (access token persisted correctly), you can check the status of _AccessTokenStore_ in order to skip this process.
+After user's first login (access token persisted correctly), you can check the status of _TokenManager_ in order to skip this process.
 Below is the sample code of checking token status and redirecting to login screen if refresh token does not exist.
 
 ```dart
-AccessToken token = await AccessTokenStore.instance.fromStore();
+AccessToken token = await TokenManager.instance.getToken();
 if (token.refreshToken == null) {
   Navigator.of(context).pushReplacementNamed('/login');
 } else {
@@ -371,7 +376,7 @@ Future<void> retryAfterUserAgrees(List<String> requiredScopes) async {
     // Getting a new access token with current access token and required scopes.
     String authCode = await AuthCodeClient.instance.requestWithAgt(e.requiredScopes);
     AccessTokenResponse token = await AuthApi.instance.issueAccessToken(authCode);
-    AccessTokenStore.instance.toStore(token); // Store access token in AccessTokenStore for future API requests.
+    TokenManager.instance.setToken(token); // Store access token in TokenManager for future API requests.
     await requestFriends();
 }
 
@@ -408,7 +413,7 @@ Future<void> retryAfterUserAgrees(List<String> requiredScopes) async {
     // Getting a new access token with current access token and required scopes.
     String authCode = await AuthCodeClient.instance.requestWithAgt(requiredScopes);
     AccessTokenResponse token = await AuthApi.instance.issueAccessToken(authCode);
-    AccessTokenStore.instance.toStore(token); // Store access token in AccessTokenStore for future API requests.
+    TokenManager.instance.setToken(token); // Store access token in TokenManager for future API requests.
     await requestMe();
 }
 ```
@@ -466,9 +471,9 @@ Tokens are automatically refreshed on relevant api errors (ApiErrorCause.INVALID
 
 An additional consent window will appear automatically on relevant api errors (ApiErrorCause.INSUFFICIENT_SCOPE). 
 
-## Development Guide
+## How to Contribute
 
-Visit this [Development Guide](https://github.com/kakao/kakao_flutter_sdk/wiki/Development-Guide) to contribute to this repository.
+If you want to contribute to this repository, Please read [Development Guide](https://github.com/kakao/kakao_flutter_sdk/wiki/Development-Guide) and [Submitting Pull Requests](https://github.com/kakao/kakao_flutter_sdk/wiki/Submitting-Pull-Requests) pages.
 
 
 ## References
