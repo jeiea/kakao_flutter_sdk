@@ -36,7 +36,7 @@ class KakaoFlutterSdkPlugin : MethodCallHandler, FlutterPlugin, ActivityAware {
         fun registerWith(registrar: Registrar) {
             val instance = KakaoFlutterSdkPlugin()
             instance.onAttachedToEngine(registrar.context(), registrar.messenger())
-            instance.onAttachedToActivity(registrar.activity())
+            registrar.activity()?.let(instance::onAttachedToActivity)
         }
     }
 
